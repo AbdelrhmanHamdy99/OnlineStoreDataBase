@@ -66,6 +66,25 @@ CREATE TABLE USERS
 ALTER TABLE USERS
 ADD ACTIVE BIT NOT NULL;
 
+-- Create function for disjoint (should be located at Scalar valued functions folder)
+CREATE FUNCTION userNotExistsInStaff 
+(
+	-- Add the parameters for the function here
+	@field CHAR(9)
+)
+RETURNS bit
+AS
+BEGIN
+	IF @field not in (select STAFF.SSN from STAFF)
+        return 1
+    return 0
+
+END
+
+-- Add disjoint constraint between users and staff to keep ssn unique
+alter table USERS
+add  CONSTRAINT users_disjoint_staff check(dbo.userNotExistsInStaff(users.ssn) = 1);
+
 --MAKE FEEDBACK ID UNIQUE FOR EACH USER and allow nulls
 CREATE UNIQUE NONCLUSTERED INDEX idx_col1
 ON USERS(FeedbackID)
@@ -143,10 +162,23 @@ CREATE TABLE STAFF
 alter table staff
 alter column access_key varchar(10) not null;
 
---mesh 3aref a3melha
+-- Create function for disjoint (should be located at Scalar valued functions folder)
+CREATE FUNCTION notExists
+(
+	-- Add the parameters for the function here
+	@field Char(9)
+)
+RETURNS bit
+AS
+BEGIN
+    IF @field not in (select users.SSN from users)
+        return 1
+    return 0
+END
+
+-- Add disjoint constraint between staff and users to keep ssn unique 
 alter table staff
-add  CONSTRAINT staff_disjoint_users CHECK (SSN NOT IN (SELECT SSN FROM users));
---sad :)
+add  CONSTRAINT staff_disjoint_users check(dbo.notExists(staff.ssn) = 1);
 
 --fill up staff table
 BULK
@@ -379,7 +411,7 @@ FIELDTERMINATOR = ',',
 ROWTERMINATOR = '\n'
 )
 GO
---MA3MALTHASH YALAHWEEEE
+
 CREATE TABLE Request(
   ORDER_ID VARCHAR(4) NOT NULL,
   INV_ID VARCHAR(12) NOT NULL,
