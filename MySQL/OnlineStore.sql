@@ -1,15 +1,6 @@
 --create data base
 CREATE DATABASE ONLINESHOP --create tables
-use ONLINESHOP;
-
--- @block
-DROP TABLE request;
-
---@block
-DELETE FROM users;
-
--- @block
-SELECT * FROM staff;
+USE ONLINESHOP;
 
 -- @block
 CREATE TABLE PERSON (
@@ -29,7 +20,6 @@ CREATE TABLE PERSON (
 );
 
 -- @block
--- Load data from csv file
 LOAD DATA LOCAL INFILE './data/PERSON.csv'
 INTO TABLE PERSON 
 FIELDS TERMINATED BY ','
@@ -44,7 +34,6 @@ CREATE TABLE FEEDBACK (
 );
 
 -- @block
--- Load data from csv file
 LOAD DATA LOCAL INFILE './data/FEEDBACK.csv'
 INTO TABLE FEEDBACK 
 FIELDS TERMINATED BY ','
